@@ -53,9 +53,6 @@ if ($channel_name) {
     . " OR safe_cast_to_json(tag.description)->>'category_id'='${category_id_escaped}')";
 }
 
-$user_is_admin = (is_user_admin($dbconn) > 0 ? true : false);
-
-
 // e-mail
 try {
     $email = auth_get_google_email();
@@ -91,9 +88,7 @@ $query = "DELETE FROM tag WHERE tag.id IN
     (SELECT tag.id FROM tag 
     INNER JOIN users ON users.id = tag.user_id 
     LEFT JOIN channel ON tag.channel_id = channel.id 
-    WHERE (${channel_where}) ".($user_is_admin ? "" : " AND users.email='${email_escaped}'")." AND (${condition_where}));";
-
-#echo $query;
+    WHERE (${channel_where}) AND users.email='${email_escaped}' AND (${condition_where}));";
 
 if (!pg_query($dbconn, $query)) {
     send_error(1, "DB access error");

@@ -12,16 +12,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     header('Access-Control-Allow-Origin: *');
 }
 
-function get_errors() {
-    $ret = "";
-    $errors = libxml_get_errors();
-    foreach ($errors as $error) {
-	$ret .= "Code: ".$error->code.", \"".trim($error->message)."\" at line ".$error->line."\n";
-    }
-    libxml_clear_errors();
-    return $ret;
-}
-
 function get_input_dom($schema_file, $is_relax_ng = false) {
     $xml_post = file_get_contents('php://input');
     if (!$xml_post) {
@@ -33,16 +23,16 @@ function get_input_dom($schema_file, $is_relax_ng = false) {
     $dom->loadXML($xml_post);
 
     if (!$dom) {
-        throw new Exception('Error: resource isn\'t XML document. '.get_errors(), 1);
+        throw new Exception('Error: resource isn\'t XML document.', 1);
     }
 
     if ($is_relax_ng) {
         if (!$dom->relaxNGValidate($schema_file)) {
-            throw new Exception('Error: not valid input XML document. '.get_errors(), 1);
+            throw new Exception('Error: not valid input XML document.', 1);
         }
     } else {
         if (!$dom->schemaValidate($schema_file)) {
-            throw new Exception('Error: not valid input XML document. '.get_errors(), 1);
+            throw new Exception('Error: not valid input XML document.', 1);
         }
     }
 

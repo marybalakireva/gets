@@ -135,4 +135,3 @@ PointsMain.prototype.showOverlay = function() {
 PointsMain.prototype.hideOverlay = function() {
     $(this.mainPoints).find('#points-main-overlay').removeClass('busy-overlay-visible');
 };
-

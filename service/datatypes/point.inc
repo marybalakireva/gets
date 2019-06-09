@@ -14,6 +14,7 @@ class Point {
     public $altitude = 0;
     public $time;
     public $uuid;
+    public $key;
     
     public $access = true;
     public $category_id;
@@ -130,7 +131,9 @@ class Point {
         if ($this->category_id) {
             $xml .= '<Data name="category_id"><value>' . $this->category_id . '</value></Data>';
         }
-        
+        if ($this->key) {
+            $xml .= '<Data name="key"><value>' . $this->key . '</value></Data>';
+        }
         foreach ($this->extended_data as $key => $value) {
             if (is_scalar($value)) {
                 $value = htmlspecialchars($value);
@@ -187,7 +190,9 @@ class Point {
         if (array_key_exists(9, $row)) {
             $point->category_id = (int) $row[9];
         }
-        
+        if (array_key_exists(10, $row)) {
+            $point->key = $row[10];
+        }
         if (array_key_exists(8, $row)) {
             $point->access = $row[8] === 't';
         }

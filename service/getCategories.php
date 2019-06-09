@@ -13,6 +13,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 $xml_post = file_get_contents('php://input');
+
+
 if (!$xml_post) {
     send_error(1, 'Error: no input file');
     die();
@@ -34,6 +36,8 @@ if (!$dom->schemaValidate('schemes/getCategories.xsd')) {
 
 $auth_token = get_request_argument($dom, 'auth_token');
 $dbconn = pg_connect(GEO2TAG_DB_STRING);
+
+
 // Token unused but still check if supplied
 try {
     if ($auth_token) {
@@ -103,6 +107,8 @@ while ($row = pg_fetch_row($result)) {
 }
 
 $xml .= '</categories>';
+
+
 
 send_result(0, 'success', $xml);
 

@@ -65,7 +65,6 @@ PointsPage.prototype.initPage = function() {
         }
         if (!this._categories) {
             this._categories = new CategoriesClass();
-            this._points.setCategories(this._categories);
         }
         if (!this._user) {
             this._user = new UserClass(this.window);
@@ -103,7 +102,7 @@ PointsPage.prototype.initPage = function() {
         }        
     } catch (Exception) {
         MessageBox.showMessage(Exception.toString(), MessageBox.ERROR_MESSAGE);
-        Logger.error(Exception);
+        Logger.error(Exception.toString());
     }
     
     //Init first page
@@ -114,7 +113,7 @@ PointsPage.prototype.initPage = function() {
     this._pointsMain.toggleOverlay();
     this._pointsMain.setLatitude(this._mapCtrl.getMapCenter().lat);
     this._pointsMain.setLongitude(this._mapCtrl.getMapCenter().lng);
-    
+
 
     // Hash change handler
     $(this.window).on('hashchange', function() {
@@ -525,9 +524,10 @@ PointsPage.prototype.showPointInfo = function() {
         if (!pointUUID) {
             throw new GetsWebClientException('Track Page Error', 'showPointInfo, hash parameter point uuid undefined');
         }
-        var point = this._points.findPointInPointList(pointUUID);
+        this._points.findPointInPointList(pointUUID);
         
-        this._pointInfo.placePointInPointInfo(point, this._user.isLoggedIn());
+        Logger.debug(this._points.getPoint());
+        this._pointInfo.placePointInPointInfo(this._points.getPoint(), this._user.isLoggedIn());
         
         this.currentView.hideView();
         this.currentView = this._pointInfo;
@@ -606,42 +606,9 @@ PointsPage.prototype.downloadPointsHandler = function() {
     try {
         this._pointsMain.showOverlay();
         var formData = $(this.document).find('#point-main-form').serializeArray();
-        this._points.setCategories(this._categories);
+
         this._points.downLoadPoints(formData, function () {
-    	    Logger.time('total update after download');
             var pointList = that._points.getPointList();
-            /*var points_json = "[";
-             for (var i = 0; i < pointList.length; i++) {
-             var flag = false;
-             for (var j = 0, len = pointList[i].extendedData.length; j < len; j++)
-             {
-             if (pointList[i].extendedData[j].name == "rating") {
-             points_json += "{'difficulty': " + pointList[i].extendedData[j].value + ",";
-             flag = true;
-             break;
-             }
-             }
-             if (flag) {
-             var coords = pointList[i].coordinates.split(',');
-             points_json += "'lat':" + coords[1] + ",";
-             points_json += "'lng':" + coords[0] + ",";
-             points_json += "'uuid':" +  pointList[i].uuid + ",";
-             if (i == pointList.length - 1)
-             points_json += "'category_id':" + pointList[i].category_id + "}";
-             else
-             points_json += "'category_id':" + pointList[i].category_id + "},";
-             }
-             }
-             points_json += "]";
-             $.ajax({
-             type: 'POST',
-             url: GET_JSON_ACTION,
-             dataType: 'text ',
-             data: "jsonPoints="+points_json,
-             success: function() {
-             alert("done");
-             }
-             });*/
             that._mapCtrl.removePointsFromMap();
             that._pointsMain.placePointsInPointList(pointList);
             that._mapCtrl.placePointsOnMap(pointList, {
@@ -649,11 +616,9 @@ PointsPage.prototype.downloadPointsHandler = function() {
                 text: $(that._pointInfo.getView()).data('putpoint')
             });
             that._pointsMain.hideOverlay();
-    	    Logger.timeEnd('total update after download');
         });
     } catch (Exception) {
         MessageBox.showMessage(Exception.toString(), MessageBox.ERROR_MESSAGE);
         Logger.error(Exception.toString());
-    }
+    } 
 };
-

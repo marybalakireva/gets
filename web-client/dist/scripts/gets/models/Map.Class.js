@@ -20,19 +20,6 @@ function MapClass() {
     this.searchArea = null;
     this.userMarker = null;
     this.pointsLayer = null;
-    this.safeRoutePointsLayer = null;
-    this.normalRoutePointsLayer = null;
-    this.hardRoutePointsLayer = null;
-    this.socialsLayer = null;
-    this.routeLayer = null;
-    this.routeLayerArray = null;
-    this.currentRouteLayer = null;
-    this.socialMarkers = [];
-    this.socialList = [];
-    this.currentPosition = [];
-    this.routeStartMarker = null;
-    this.routeTargetLocation = null;
-    this.updateProcessID = null;
 }
 
 // Route types
@@ -53,7 +40,7 @@ MapClass.ROUTE_TYPE_CURVE_SERVICE_COLOR = '#00AA00';
  */
 MapClass.prototype.initMap = function() {
     if (!this.baseMapLayer) {
-        this.baseMapLayer = L.tileLayer(TILE_PROVIDER + '/{z}/{x}/{y}.png', {
+        this.baseMapLayer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
         });
     } 
@@ -62,97 +49,21 @@ MapClass.prototype.initMap = function() {
         this.map = L.map('map', {
             center: [61.7830, 34.350],
             zoom: 10,
-            zoomControl: false,
             layers: [this.baseMapLayer],
             contextmenu: true,
-            contextmenuWidth: 140
+            contextmenuWidth: 140,
+            contextmenuItems: [{
+                text: 'Add marker',
+                callback: function () { alert('click add marker') }
+            }]
         });
-        var that = this;
-        L.Control.zoomHome = L.Control.extend({
-            options: {
-                position: 'topright',
-                zoomInText: '+',
-                zoomInTitle: gettext('Zoom in'),
-                zoomOutText: '-',
-                zoomOutTitle: gettext('Zoom out'),
-                zoomHomeText: '<i class="fa fa-home" style="line-height:1.65;"></i>',
-                zoomHomeTitle: gettext('Zoom home')
-            },
-
-            onAdd: function (map) {
-                var controlName = 'gin-control-zoom',
-                    container = L.DomUtil.create('div', controlName + ' leaflet-bar'),
-                    options = this.options;
-
-                this._zoomInButton = this._createButton(options.zoomInText, options.zoomInTitle,
-                    controlName + '-in', container, this._zoomIn);
-                this._zoomHomeButton = this._createButton(options.zoomHomeText, options.zoomHomeTitle,
-                    controlName + '-home', container, this._zoomHome);
-                this._zoomOutButton = this._createButton(options.zoomOutText, options.zoomOutTitle,
-                    controlName + '-out', container, this._zoomOut);
-
-                this._updateDisabled();
-                map.on('zoomend zoomlevelschange', this._updateDisabled, this);
-
-                return container;
-            },
-
-            onRemove: function (map) {
-                map.off('zoomend zoomlevelschange', this._updateDisabled, this);
-            },
-
-            _zoomIn: function (e) {
-                this._map.zoomIn(e.shiftKey ? 3 : 1);
-            },
-
-            _zoomOut: function (e) {
-                this._map.zoomOut(e.shiftKey ? 3 : 1);
-            },
-
-            _zoomHome: function (e) {
-                that.map.setView(that.currentPosition, 15);
-            },
-
-            _createButton: function (html, title, className, container, fn) {
-                var link = L.DomUtil.create('a', className, container);
-                link.innerHTML = html;
-                link.href = '#';
-                link.title = title;
-
-                L.DomEvent.on(link, 'mousedown dblclick', L.DomEvent.stopPropagation)
-                    .on(link, 'click', L.DomEvent.stop)
-                    .on(link, 'click', fn, this)
-                    .on(link, 'click', this._refocusOnMap, this);
-
-                return link;
-            },
-
-            _updateDisabled: function () {
-                var map = this._map,
-                    className = 'leaflet-disabled';
-
-                L.DomUtil.removeClass(this._zoomInButton, className);
-                L.DomUtil.removeClass(this._zoomOutButton, className);
-
-                if (map._zoom === map.getMinZoom()) {
-                    L.DomUtil.addClass(this._zoomOutButton, className);
-                }
-                if (map._zoom === map.getMaxZoom()) {
-                    L.DomUtil.addClass(this._zoomInButton, className);
-                }
-            }
-        });
-// add the new control to the map
-        var zoomHome = new L.Control.zoomHome();
-        zoomHome.addTo(this.map);
     }
-        
-      /*
+      
     if (!this.layersControl) {
         this.layersControl = L.control.layers({
             "Base map": this.baseMapLayer
         }, null, {position: 'topleft'}).addTo(this.map);
-    }*/
+    }
 };
 
 L.NumberedDivIcon = L.Icon.extend({
@@ -312,7 +223,7 @@ MapClass.prototype.addTrackPointsToLayerGroup = function (track, group) {
         }).bindPopup(
                 '<b>' + track.points[i].name + '</b><br>' +
                 '<img class="info-image" alt="No image" src="' + track.points[i].photo + '">' +
-                (track.points[i].description != '{}' ? track.points[i].description : "") + '<br>' +
+                track.points[i].description + '<br>' +
                 track.points[i].coordinates + '<br>' +
                 '<a href="' + track.points[i].url + '">' + track.points[i].url + '</a>' +
                 '<audio controls src="' + track.points[i].audio + '"></audio>' +
@@ -563,294 +474,25 @@ MapClass.prototype.placePointsOnMap = function(pointList, markerBaseLink) {
     if (!pointList) {
         throw new GetsWebClientException('Map Error', 'placePointsOnMap, pointList undefined or null.');
     }
-    if (this.updateProcessID != null) {
-	clearInterval(this.updateProcessID);
-    }
-    this.pointsLayer = new L.markerClusterGroup({disableClusteringAtZoom: 17});
-    
-    var iconsArray = {};
-    var markersList = [];
-    var curIndex = 0;
-    var that = this;
-
-    this.updateProcessID = setInterval(function() {
-    for (var i = curIndex; i < pointList.length && i < curIndex + 50; i++) {
+    this.pointsLayer = new L.MarkerClusterGroup();
+     
+    for (var i = 0; i < pointList.length; i++) {
         var coords = pointList[i].coordinates.split(',');
-        if (typeof iconsArray[pointList[i].category_id] == 'undefined') {
-    	    var imgUrl = pointList[i].iconURL;
-    	    if (imgUrl != '') {
-    		//Logger.debug(imgUrl);
-    		iconsArray[pointList[i].category_id] = L.icon({iconUrl: imgUrl,iconSize:[30,30]});
-    	    } else {
-    		iconsArray[pointList[i].category_id] = new L.Icon.Default;
-    	    }
-        }
-        var marker = L.marker([coords[1], coords[0]], {title: pointList[i].name, draggable: false, icon: iconsArray[pointList[i].category_id]}); //{icon: myIcon}
-
-        marker.uuid = pointList[i].uuid;
-        marker.title = pointList[i].name;
-        marker.category_id = pointList[i].category_id;
-        marker.categoryName = pointList[i].categoryName;
-        marker.iconURL = pointList[i].iconURL;
-
-
-        markersList.push(marker);
-
+                  
+        var marker = L.marker([coords[1], coords[0]], {title: pointList[i].name}); //{icon: myIcon}
+        this.pointsLayer.addLayer(marker);
+        
         var popup = L.popup()
-            .setContent('<img style="float:left" src="' + pointList[i].iconURL + '" width="30"/>' +
-            '<b>' + pointList[i].name +
-            '</b>' + (pointList[i].description != '{}' ? '<br>' + pointList[i].description : '') +
-            (markerBaseLink ?
-            '<br><a id="' + that.pointsLayer.getLayerId(marker) + '" href="' + markerBaseLink.url + pointList[i].uuid + '">' + markerBaseLink.text + '</a>' : '')
-        );
-        marker.bindPopup(popup);
-
-        marker.on('contextmenu', function(e) {
-            if (this.dragging.enabled())
-                this.dragging.disable();
-            else
-                this.dragging.enable();
-            var updPoint= new PointsClass();
-            updPoint.point = {};
-            updPoint.point.uuid = this.uuid;
-            var latLng = this.getLatLng();
-            updPoint.addPoint([{name: "longitude", value: latLng.lng.toString()}, {name: "latitude", value: latLng.lat.toString()},
-                {name: "category", value: this.category_id}, {name: "title", value: this.title}], true, null);
-        });
-    }
-    curIndex+=50;
-    Logger.debug("uploaded markers = " +markersList.length + "; processID=" + that.updateProcessID);
-    if (curIndex >= pointList.length) {
-	clearInterval(that.updateProcessID);
-	that.updateProcessID = null;
-	that.pointsLayer.addLayers(markersList);
-	that.map.addLayer(that.pointsLayer);
-    }
-    }, 4);
-
-};
-
-
-function onEachFeature(feature, layer) {
-    var popupContent = '<br><a href="' + feature.properties.popupContent + '">'+gettext("put-track-in-track-info")+'</a>';
-    layer.bindPopup(popupContent);
-}
-MapClass.prototype.placeRouteOnMap = function (route, points, routeBaseLink, categories) {
-        var that = this;
-        var coords = [];
-        //this.routesPointsLayer = new L.MarkerClusterGroup({disableClusteringAtZoom: 17});
-        switch(route.getType()) {
-    	    case "safe": 
-    		this.safeRoutePointsLayer = L.layerGroup();
-    		break;
-    	    case "normal":
-    		this.normalRoutePointsLayer = L.layerGroup();
-    		break;
-    	    case "fastest": 
-    		this.fastestRoutePointsLayer = L.layerGroup();
-    		break;
-    	    default:
-    		alert("Unknown route type");
-        }
-        $.each(route.getObstacles(), function (id, val) {
-            var tmpPoint = points.findPointInPointList(val['uuid']);
-            var coords = tmpPoint.coordinates.split(',');
-            var tmpCategory;
-            $.each(categories, function (i,v) {
-                if($(v).find("id").text() == tmpPoint.category_id)
-                    tmpCategory = v;
-            });
-            var ic = L.icon({
-                iconUrl: $(tmpCategory).find("url").text().split('"')[3],
-                iconSize: [40,40]
-            });
-            var marker = L.marker([coords[1], coords[0]], {title: tmpPoint.name, draggable: false,  icon: ic}); //{icon: myIcon}
-            marker.uuid = tmpPoint.uuid;
-            marker.title = tmpPoint.name;
-            marker.category_id = tmpPoint.category_id;
-
-
-        switch(route.getType()) {
-    	    case "safe": 
-        	that.safeRoutePointsLayer.addLayer(marker);
-    		break;
-    	    case "normal":
-        	that.normalRoutePointsLayer.addLayer(marker);
-    		break;
-    	    case "fastest": 
-        	that.fastestRoutePointsLayer.addLayer(marker);
-    		break;
-    	    default:
-    		alert("Unknown route type");
-        }
-
-            var popup = L.popup()
-                .setContent(
-                    '<b>' + tmpPoint.name +
-                    '</b><br>' +(tmpPoint.description != '{}' ? tmpPoint.description : ""));
-            marker.bindPopup(popup);
-        });
-        //this.routeLayer.addLayer(this.easyRoutePointsLayer);
-        $.each(route.getRouteCoords(), function (id, val) {
-            coords.push([val['lng'],val['lat']]);
-        });
-        var currRoute = {
-            "type": "Feature",
-            "properties": {
-                "type": route.getType(),
-                "popupContent": routeBaseLink,
-                "underConstruction": false
-            },
-            "geometry": {
-                "type": "LineString",
-                "coordinates": coords
-            }
-        };
-    var geoJsonRuteLayer = L.geoJson(currRoute, {
-        onEachFeature: onEachFeature,
-        style: function(feature) {
-            switch (feature.properties.type) {
-                case 'normal': return {color: "#f1c40f", opacity: 0.5};
-                case 'safe':   return {color: "#2ecc71", opacity: 0.5};
-                case 'fastest':   return {color: "#c0392b", opacity: 0.5};
-            }
-        }
-    });
-    var that = this;
-    geoJsonRuteLayer.on('click', function (e) {
-        var layer = e.target;
-        layer.setStyle({opacity: 1});
-        layer.bringToFront();
-    });
-    this.routeLayerArray[route.getType()] = geoJsonRuteLayer;
-    this.routeLayer.addLayer(geoJsonRuteLayer);
-    this.map.addLayer(this.routeLayer);
-};
-
-MapClass.prototype.setCurrentRouteLayer = function (type) {
-    $.each(this.routeLayerArray, function (key, value) {
-        value.setStyle({opacity: 0.5});
-    });
-    this.currentRouteLayer = this.routeLayerArray[type];
-    this.currentRouteLayer.fire("click");
-    Logger.debug("type is " + type);
-    
-    switch (type) {
-	case 'safe': 
-	    this.routeLayer.addLayer(this.safeRoutePointsLayer);
-	    if (this.routeLayer.hasLayer(this.normalRoutePointsLayer)) this.routeLayer.removeLayer(this.normalRoutePointsLayer);
-	    if (this.routeLayer.hasLayer(this.fastestRoutePointsLayer)) this.routeLayer.removeLayer(this.fastestRoutePointsLayer);
-	    break;
-	case 'normal': 
-	    if (this.routeLayer.hasLayer(this.safeRoutePointsLayer)) this.routeLayer.removeLayer(this.safeRoutePointsLayer);
-	    this.routeLayer.addLayer(this.normalRoutePointsLayer);
-	    if (this.routeLayer.hasLayer(this.fastestRoutePointsLayer)) this.routeLayer.removeLayer(this.fastestRoutePointsLayer);
-	    break;
-	case 'fastest': 
-	    if (this.routeLayer.hasLayer(this.safeRoutePointsLayer)) this.routeLayer.removeLayer(this.safeRoutePointsLayer);
-	    if (this.routeLayer.hasLayer(this.normalRoutePointsLayer)) this.routeLayer.removeLayer(this.normalRoutePointsLayer);
-	    this.routeLayer.addLayer(this.fastestRoutePointsLayer);
-	    break;
-    }
-};
-
-MapClass.prototype.getCurrentRouteLayer = function () {
-  return this.currentRouteLayer;
-};
-
-MapClass.prototype.removeRoutesFromMap = function () {
-    if (this.routeLayer) {
-        this.map.removeLayer(this.routeLayer);
-    }
-    this.routeLayerArray = {};
-    this.routeLayer = new L.layerGroup();
-};
-
-MapClass.prototype.placeSocialsOnMap = function(socialList) {
-    this.socialList = socialList;
-    this.socialsLayer = new L.MarkerClusterGroup({disableClusteringAtZoom: 17});
-    for (var i = 0; i < socialList.length; i++) {
-        var coords = socialList[i].coordinates.split(',');
-        var ic = L.icon({
-            iconUrl: socialList[i].icon,
-            iconSize: [40,40]
-        });
-        var marker = L.marker([coords[0], coords[1]], {title: socialList[i].name, draggable: false, icon: ic}); //{icon: myIcon}
-        marker.uuid = socialList[i].uuid;
-        marker.title = socialList[i].title;
-        this.socialsLayer.addLayer(marker);
-        this.socialMarkers.push(marker);
-
-        var popup = L.popup().setContent("<center>" + socialList[i].title + "<br><button class='route_to' name="+ coords + ">" + gettext("Route to") + 
-    	    "</button><br><button class='social_info' name='"+ socialList[i].uuid+"'>"+ gettext("put-point-in-point-info") +"</button></center>");
-        var self = this;
+            .setContent(
+                '<b>' + pointList[i].name + 
+                '</b><br>' + pointList[i].description + 
+                (markerBaseLink ? 
+                    '<br><a id="' + this.pointsLayer.getLayerId(marker) + '" href="' + markerBaseLink.url + pointList[i].uuid + '">' + markerBaseLink.text + '</a>' : '')
+            );  
         marker.bindPopup(popup);
     }
-
-    this.map.addLayer(this.socialsLayer);
-};
-MapClass.prototype.placeFilteredSocialsOnMap = function(categoryId, states) {
-    this.removeSocialsLayer();
-    var socialList = this.socialList;
-    this.socialsLayer = new L.MarkerClusterGroup({disableClusteringAtZoom: 17});
-    for (var i = 0; i < socialList.length; i++) {
-
-        var isPassed = false;
-        $.each(socialList[i].scopes, function (id, val) {
-           if (states[val.Id])
-            isPassed = true;
-        });
-        if (!isPassed)
-            continue;
-
-        var coords = socialList[i].coordinates.split(',');
-        var imgUrl;
-        switch (socialList[i].accessRelations[categoryId]) {
-            // mother of god
-            case 0:
-                imgUrl = ICONS_FOLDER + 'ic_location_green.png';
-                break;
-            case 1:
-                imgUrl = ICONS_FOLDER + 'ic_location_yellow.png';
-                break;
-            case 2:
-                imgUrl = ICONS_FOLDER + 'ic_location_red.png';
-                break;
-            case 3:
-                imgUrl = ICONS_FOLDER + 'ic_location_gray.png';
-                break;
-            default:
-                continue;
-        }
-
-        var ic = L.icon({
-            iconUrl: imgUrl,
-            iconSize: [40,40]
-        });
-        var marker = L.marker([coords[0], coords[1]], {title: socialList[i].name, draggable: false, icon: ic}); //{icon: myIcon}
-        marker.uuid = socialList[i].uuid;
-        marker.title = socialList[i].title;
-        marker.scopes = socialList[i].scopes;
-        this.socialsLayer.addLayer(marker);
-        this.socialMarkers.push(marker);
-
-        var popup = L.popup().setContent("<center>" + socialList[i].title + "<br><button class='route_to' name="+ coords + ">" + gettext("Route to") + "</button></center>");
-        var self = this;
-        marker.bindPopup(popup);
-    }
-
-    this.map.addLayer(this.socialsLayer);
-};
-
-MapClass.prototype.setMapCenterOnSocial = function(uuid) {
-    for (var i = 0; i < this.socialMarkers.length; i++)
-     if (this.socialMarkers[i].uuid == uuid) {
-         this.map.setView(this.socialMarkers[i].getLatLng(), 18);
-         this.socialMarkers[i].openPopup();
-     }
-/*    $.each(this.socialMarkers)
-        alert(this.uuid);
-    this.map.setView([latitude, longitude], 11);*/
+  
+    this.map.addLayer(this.pointsLayer);
 };
 
 MapClass.prototype.closePopupInPointsLayer = function(id) {
@@ -864,13 +506,6 @@ MapClass.prototype.removePointsLayer = function() {
     if (this.pointsLayer) {
         this.map.removeLayer(this.pointsLayer);
         this.pointsLayer = null;
-    }
-};
-
-MapClass.prototype.removeSocialsLayer = function() {
-    if (this.socialsLayer) {
-        this.map.removeLayer(this.socialsLayer);
-        this.socialsLayer = null;
     }
 };
 
@@ -944,17 +579,9 @@ MapClass.prototype.checkTrack = function(track) {
  * @param {Double} longitude
  */
 MapClass.prototype.setCenter = function(latitude, longitude) {
-/*    var ic = L.icon({
-        iconUrl: "img/pegman.png",
-        iconSize: [40,40]
-    });
-    var marker = L.marker([latitude, longitude], {title: "Вы здесь", draggable: false,  icon: ic});
-    this.map.addLayer(marker);
-*/
-    this.updateStartMarker(latitude,longitude);
-    this.currentPosition = [latitude,longitude];
-    this.map.setView([latitude, longitude], 15);
+    this.map.setView([latitude, longitude], 11);
 };
+
 /**
  * Get center of a map.
  * 
@@ -967,41 +594,6 @@ MapClass.prototype.getCenter = function() {
 MapClass.prototype.getSize = function() {
     return this.map.getSize();
 };
-
-MapClass.prototype.updateStartMarker = function(latitude, longitude) {
-	if (this.routeStartMarker !== null) {
-	    this.routeStartMarker.setLatLng([latitude, longitude]);
-	    this.routeStartMarker.update();
-	} else {
-	    // координаты есть, маркера нет
-	    var ic = L.icon({
-    		iconUrl: "img/pegman.png",
-    		iconSize: [40,40]});
-	    this.routeStartMarker = L.marker([latitude, longitude], {title: gettext("Start point"), draggable: false, icon:ic});
-	    this.map.addLayer(this.routeStartMarker);
-	}
-}
-
-MapClass.prototype.updateTargetLocation = function(latitude, longitude) {
-	if (this.routeTargetLocation !== null) {
-	    this.routeTargetLocation.setLatLng([latitude, longitude]);
-	    this.routeTargetLocation.update();
-	} else {
-	    // координаты есть, маркера нет
-	    var ic = L.icon({
-    		iconUrl: "images/icons/finished.png",
-    		iconSize: [40,40]});
-	    this.routeTargetLocation = L.marker([latitude, longitude], {title: gettext("Finish point"), draggable: false, icon:ic});
-	    this.map.addLayer(this.routeTargetLocation);
-	}
-/*    var ic = L.icon({
-        iconUrl: "img/pegman.png",
-        iconSize: [40,40]
-    });
-    var marker = L.marker([latitude, longitude], {title: "Вы здесь", draggable: false,  icon: ic});
-    this.map.addLayer(marker);
-*/
-}
 
 /**
  * Create draggable temporary marker which will send coordinates on drag. Marker 

@@ -1,5 +1,4 @@
 <?php
-    //require_once('../config.php');
 
     require_once('utils/process_request.inc');
     require_once('utils/constants.inc');

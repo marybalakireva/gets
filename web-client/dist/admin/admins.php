@@ -6,13 +6,14 @@ session_start(); echo "azaza " . $_SESSION['g2t_token'];
 ?>
 <html>
     <head>     
-        <link rel="stylesheet" href="styles/bootstrap/bootstrap.min.css">
-        <link rel="stylesheet" href="styles/bootstrap/bootstrap-theme.min.css">
-        <link rel="stylesheet" type="text/css" href="styles/leaflet/leaflet.css"/>
-        <link rel="stylesheet" type="text/css" href="styles/bootstrap/ekko-lightbox.min.css"/>
-        <link rel="stylesheet" type="text/css" href="styles/bootstrap/bootstrap-slider.min.css"/>
+        <link rel="stylesheet" href="styles/bootstrap-3.2.0/bootstrap.css">          
+        <link rel="stylesheet" href="styles/bootstrap-3.2.0/bootstrap.min.css">
+        <link rel="stylesheet" href="styles/bootstrap-3.2.0/bootstrap-theme.min.css">
+        <link rel="stylesheet" type="text/css" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css"/>
+        <link rel="stylesheet" type="text/css" href="styles/bootstrap-3.2.0/bootstrap-lightbox.min.css"/>
+        <link rel="stylesheet" type="text/css" href="styles/bootstrap-slider.min.css"/>
         <link rel="stylesheet" href="styles/languages.min.css">
-        <link rel="stylesheet" type="text/css" href="styles/leaflet/leaflet.contextmenu.css"/>
+        <link rel="stylesheet" type="text/css" href="styles/leaflet.contextmenu.css"/>
         <?php
         include_once('html_headers.php');
         ?>
@@ -22,15 +23,15 @@ session_start(); echo "azaza " . $_SESSION['g2t_token'];
         <!-- ADD IMAGE CONSTANTS SPECIFIC FOR DOMAIN -->
         <script src="images/generateImagesPaths.php"></script>
         
-        <script src="scripts/jquery/jquery-3.2.0.min.js"></script>
+        <script src="scripts/jquery/jquery-1.11.1.min.js"></script>
         <script src="scripts/jquery/jquery.cookie.js"></script>
         <script src="scripts/bootstrap/bootstrap.min.js"></script>
-        <script src="scripts/bootstrap/ekko-lightbox.min.js"></script>
-        <script src="scripts/leaflet/leaflet.js"></script>
+        <script src="scripts/bootstrap/bootstrap-lightbox.min.js"></script>
+        <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
         <script src="scripts/logger.min.js"></script>
         <script src="scripts/readmore.min.js"></script>
-        <script src="scripts/bootstrap/bootstrap-slider.min.js"></script>
-        <script src="scripts/leaflet/leaflet.contextmenu.js"></script>
+        <script src="scripts/bootstrap-slider.min.js"></script>
+        <script src="scripts/leaflet.contextmenu.js"></script>
         <script src="scripts/Polyline.encoded.js"></script>
         <script src="scripts/graham_scan.min.js"></script>
         <script src="scripts/jquery.inputmask.bundle.min.js"></script>
@@ -77,13 +78,7 @@ session_start(); echo "azaza " . $_SESSION['g2t_token'];
                 <div class="action-menu">
                     
                     <?php 
-                    //require_once('./widgets/TracksMain.inc');
-                   // require_once('./widgets/TrackInfo.inc');
-                   // require_once('./widgets/PointInfo.inc');
-                   /* if (isset($_SESSION['g2t_token'])) {                        
-                        require_once('./widgets/TrackEdit.inc');
-                        require_once('./widgets/PointEdit.inc');
-                    }*/
+
                     ?>
 
                     
@@ -94,14 +89,7 @@ session_start(); echo "azaza " . $_SESSION['g2t_token'];
                                 require_once('./widgets/AdminsMenu.inc');
                                 echo get_admin_menu_item($_GET['menu']);
                             ?>
-                          <!--  <div><p>Категории</p></div>  
-                            <div><p>hghfghgfhf</p></div> 
 
-                            <ul class="nav nav-pills nav-stacked">
-                                <li><a href="#">Home</a></li>
-                                <li class='active'><a href="#">Home</a></li>
-                                <li><a href="#">Home</a></li>
-                            </ul>-->
 
                             <div id="tracks-list" class="list-group">
                             </div>            

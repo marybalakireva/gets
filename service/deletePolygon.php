@@ -11,7 +11,6 @@ try {
 
     $auth_token = get_request_argument($dom, 'auth_token');
     $channel_name = get_request_argument($dom, 'name');
-    $channel_id = get_request_argument($dom, 'id');
 
     $dbconn = pg_connect(GEO2TAG_DB_STRING);
     auth_set_token($auth_token);
@@ -22,17 +21,10 @@ try {
 
     // admin user not required to check email
     if ($user_is_admin) {
-        if(isset($channel_id)){
-            $query = "DELETE FROM channel 
-                WHERE channel.id=$1 RETURNING channel.id;";
+        $query = "DELETE FROM channel 
+            WHERE channel.name=$1 RETURNING channel.id;";
 
-            $res = pg_query_params($dbconn, $query, array($channel_id));
-        } else {
-            $query = "DELETE FROM channel 
-                WHERE channel.name=$1 RETURNING channel.id;";
-
-            $res = pg_query_params($dbconn, $query, array($channel_name));
-        }
+        $res = pg_query_params($dbconn, $query, array($channel_name));
     } else {
         $query = "DELETE FROM channel WHERE channel.id IN
             (SELECT channel.id FROM channel

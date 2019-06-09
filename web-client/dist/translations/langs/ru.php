@@ -9,7 +9,17 @@ $translations = array(
     'routes' => 'Навигатор',
     'sign-in' => 'Войти', 
     'sign-out' => 'Выйти', 
-    
+    'feedback' => 'Обратная связь',
+    'admin-feedback' => 'Заявки',
+    'send' => 'Отправить',
+
+
+
+    'leave-feedback' => 'Оставить заявку',
+    'comment' => 'Комментарий',
+    'information-to-users' => 'Воспользуйтесь формой, чтобы задать интересующий Вас вопрос, отправить комментарии, замечания или предложения.',
+
+
     // Common label strings
     'name' => 'Имя', 
     'description' => 'Описание', 
@@ -54,7 +64,6 @@ $translations = array(
     'put-point-in-point-info' => 'Поместить точку в окно «Информация о точке»',
     'track-publish-success' => 'Маршрут был успешно опубликован', 
     'track-unpublish-success' => 'Маршрут был успешно снят с публикации',
-    'put-track-in-track-info' => 'Поместить маршрут в окно информации о маршруте',
     // Show on the map options
     'show-on-map-markers' => 'Только точки',
     'show-on-map-raw-simple' => 'Простой маршрут',
@@ -71,8 +80,6 @@ $translations = array(
     'route-parameters-alternatives' => 'Альтернативыне маршруты: ',
     'find-alternatives' => 'Искать альтернативы',
     'request-route' => 'Построить маршрут',
-    'Route to' => 'Маршрут сюда',
-    'Route from' => 'Маршрут отсюда',
        
     // Point Info widget strings
     'point-info-title' => 'Информация о точке', 
@@ -131,11 +138,13 @@ $translations = array(
     'admin-home' => 'Главная', 
     'admin-categories' => 'Категории', 
     'admin-users' => 'Пользователи', 
-    'admin-cont' => 'Контент', 
+    'admin-cont' => 'Контент',
+    'admin-feedbacks' => 'Заявки',
 
     //Admins categories page
     'list-of-all-categories' => 'Список всех категорий',
     'adding-a-category' => 'Добавление категории',
+    'all-feedbacks' => 'Список всех заявок',
 
     //Admins users page
     'search..' => 'Поиск..',
@@ -150,10 +159,7 @@ $translations = array(
     //Admins content page
     'list-of-all-points' => 'Список всех точек',
     'list-of-all-tracks' => 'Список всех маршрутов',
-
-    //route info
-    'cost' => 'Стоимость',
-    'obstacles' => 'Препятствия',
+    'list-of-all-feedbacks' => 'Список всех заявок',
 
     //other words
     'show-on-map' => 'Показать на карте',

@@ -44,26 +44,6 @@ if (!$response) {
 	die();
 }
 
-
-auth_set_token($auth_token);
-$dbconn = pg_connect(GEO2TAG_DB_STRING);
-
-try {
-    $user_id = auth_get_db_id($dbconn);
-    $admin_id = require_user_admin($dbconn);
-} catch (Exception $e) {
-    send_error(1, $e->getMessage());
-    die();
-}
-
-$result = pg_query_params($dbconn, 'DELETE FROM category WHERE (id=$1) RETURNING category.id',
-    array($category_id));
-$row = pg_fetch_row($result);
-$id = $row[0];
-
-
-/*
-
 $dom_response = new DOMDocument();
 $dom_response->loadXML($response);
 $xpath = new DOMXPath($dom_response);
@@ -79,7 +59,6 @@ if ($success_element->length == 0) {
 $xpath_query = '//methodResponse/params/param/value/string';
 $id_element = $xpath->query($xpath_query);
 $id = $id_element->item(0)->nodeValue;
-*/
 
 $content = '<category>'.$id.'</category>';
 send_result(0, 'success', $content);

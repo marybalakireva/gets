@@ -36,7 +36,7 @@ try {
     $content = '<auth_token>' . $auth_token . '</auth_token>';
     send_result(0, 'success', $content);
 } catch (GetsAuthException $e) {
-    send_error(1, "Can't login in google". $e->getMessage() . "; google_token=".$google_access_token);
+    send_error(1, "Can't login in google");
 } catch (Exception $e) {
     send_error($e->getCode(), $e->getMessage());
 }

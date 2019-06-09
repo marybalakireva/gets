@@ -15,18 +15,16 @@ function PointsClass() {
     this.point = null;
     this.needPointListUpdate = false;
     this.needPointUpdate = false;
-    this.categories = null;
 };
 
 /**
  * Check whether pointList is downloaded or not.
- */
+*/ 
 PointsClass.prototype.isPointListDownloaded = function () {
     return !!this.pointList;
 };
-
 /**
- * Check whether point is downloaded or not.
+* Check whether point is downloaded or not.
  */
 PointsClass.prototype.isPointDownloaded = function () {
     return !!this.point;
@@ -34,7 +32,7 @@ PointsClass.prototype.isPointDownloaded = function () {
 
 /**
  * Check is pointList need to be downloaded.
- */
+*/
 PointsClass.prototype.checkPointList = function () {
     if (!this.isPointListDownloaded() || this.needPointListUpdate) {
         this.downLoadPoints();
@@ -53,9 +51,8 @@ PointsClass.prototype.checkPointList = function () {
  * @param {String} paramsObj.space Filter points by space (optional; possible values = all, private, public; default=all)
  * 
  * @throws {GetsWebClientException}    
- */
+*/
 PointsClass.prototype.downLoadPoints = function(paramsObj, callback) { 
-    Logger.debug(this.categories);
     var lat = 0.0, lng = 0.0, radius = 1, categoryId = -1, space = 'public';
     
     $(paramsObj).each(function (idx, value) {
@@ -132,8 +129,8 @@ PointsClass.prototype.downLoadPoints = function(paramsObj, callback) {
             var pointExtendedData = [];
             pointObj.photos = [];
             
-            pointObj.names = $(pointListItems[i]).find('name').length ? parseVals($(pointListItems[i]).find('name').text()) : '';
-            pointObj.descriptions = $(pointListItems[i]).find('description').length ? parseVals($(pointListItems[i]).find('description').text()) : '';
+            pointObj.name = $(pointListItems[i]).find('name').length ? $(pointListItems[i]).find('name').text() : '';
+            pointObj.description = $(pointListItems[i]).find('description').length ? $(pointListItems[i]).find('description').text() : '';
             pointObj.uuid = $(pointListItems[i]).find("[name='uuid']").length ? $(pointListItems[i]).find("[name='uuid']").text() : '';
             pointObj.access = $(pointListItems[i]).find("[name='access']").length ? $(pointListItems[i]).find("[name='access']").text() : '';
             $(pointListItems[i]).find("gets\\:photo").each(function (idx, val) {
@@ -144,39 +141,6 @@ PointsClass.prototype.downLoadPoints = function(paramsObj, callback) {
             pointObj.coordinates = $(pointListItems[i]).find('coordinates').length ? $(pointListItems[i]).find('coordinates').text() : '';
             pointObj.category_id = $(pointListItems[i]).find("[name='category_id']").length ? $(pointListItems[i]).find("[name='category_id']").text() : '';
             pointObj.radius = $(pointListItems[i]).find("[name='radius']").length ? $(pointListItems[i]).find("[name='radius']").text() : '';
-            if (self.categories != null) {
-        	var category = self.categories.getCategory(pointObj.category_id);
-        	pointObj.categoryName = category.name;
-        	pointObj.iconURL = category.url.icon;
-            }else{
-        	pointObj.categoryName = '';
-        	pointObj.iconURL = '';
-            }
-            if (typeof(pointObj.names) === 'object') {
-    		var langID = lang.substr(lang.indexOf("lang=") + 5,2);
-    		if (pointObj.names.hasOwnProperty("name_" + langID)) {
-    		    pointObj.name = pointObj.names["name_" + langID];
-    		} else {
-    		    pointObj.name = pointObj.names.name;
-    		}
-    	    } else {
-    		pointObj.name = pointObj.names;
-    	    }
-    	    if (typeof(pointObj.descriptions) === 'object') {
-    		var langID = lang.substr(lang.indexOf("lang=") + 5,2);
-    		if (pointObj.descriptions.hasOwnProperty("description_" + langID)) {
-    		    pointObj.description = pointObj.descriptions["description_" + langID];
-    		} else {
-    		    if (pointObj.descriptions.hasOwnProperty("description")) {
-    			pointObj.description = pointObj.descriptions.description;
-    		    } else {
-    			pointObj.description = '{}';
-    		    }
-    		}
-    	    } else {
-    		pointObj.description = pointObj.descriptions;
-    	    }
-
             
             $(pointListItems[i]).find('Data').each(function(index, newValue) {               
                 pointExtendedData.push({name: $(newValue).attr('name')/*.replace(/_/g, ' ')*/, value: $(newValue).text()});               
@@ -193,19 +157,6 @@ PointsClass.prototype.downLoadPoints = function(paramsObj, callback) {
         }
     });
 };
-
-function parseVals(stringValue) {
-    try {
-	return JSON.parse(stringValue);
-    } catch (e) {
-	return stringValue;
-    }
-}
-
-PointsClass.prototype.setCategories = function (categoriesClass) {
-    categoriesClass.checkCategories();
-    this.categories = categoriesClass;
-}
 
 /**
  * Upload point to a given track in the GeTS Server. 
@@ -275,6 +226,7 @@ PointsClass.prototype.addPoint = function (paramsObj, update, callback) {
         }
     });
     
+    // Temprorary fix for altitude
     // Temprorary fix for altitude
     newParamsObj.altitude = 0.0;
     
@@ -395,7 +347,6 @@ PointsClass.prototype.removePoint = function (callback) {
 
 PointsClass.prototype.findPointInPointList = function(uuid) {
     if (!uuid || !this.pointList) {
-	Logger.debug("findPointInPointList with wrong UUID: " + uuid);
         return;
     }
     for (var i = 0, len = this.pointList.length; i < len; i++) {

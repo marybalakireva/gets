@@ -1,7 +1,4 @@
 <?php
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
 /**
  * Get HTML nav bar string to put on a page. 
  * Nav bar active tab will depend on given page name.
@@ -11,7 +8,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 function get_navbar_depend_on_page($page_name) {
     global $lang;
     
-    $ret =  '
+    return '
                <div class="navbar navbar-static-top navbar-default">
                     <div class="navbar-header">
                         <a class="navbar-brand navbar-option"></a>
@@ -27,22 +24,14 @@ function get_navbar_depend_on_page($page_name) {
                     </div>
                     <div class="container">
                         <div class="navbar-collapse collapse">
-                            <ul class="nav navbar-nav">';
-    if (defined('PAGE_POINTS') && constant('PAGE_POINTS') === true) {
-        $ret .= '<li ' . ($page_name === 'points' ? 'class="active"' : '') . '><a href="points.php">' . getString('points', 'Points') . '</a></li>';
-    }
-    if (defined('PAGE_TRACKS') && constant('PAGE_TRACKS') === true) {
-        $ret .= '<li ' . ($page_name === 'tracks' ? 'class="active"' : '') . '><a href="tracks.php">' . getString('tracks', 'Tracks') . '</a></li>';
-    }
-    if (defined('PAGE_ROUTES') && constant('PAGE_ROUTES') === true) {
-        $ret .= '<li ' . ($page_name === 'routes' ? 'class="active"' : '') . '><a href="routes.php">' . getString('routes', 'Routes') . '</a></li>';
-    }
-    if (defined('PAGE_POLYGONS') && constant('PAGE_POLYGONS') === true) {
-        $ret .= '<li ' . ($page_name === 'polygons' ? 'class="active"' : '') . '><a href="polygons.php">' . getString('polygons', 'Polygons') . '</a></li>';
-    }
-    $ret .= (isset($_SESSION['admin_user']) ? 
-                                    '<li ' . (substr($page_name, 0, 5) === 'admin' ? 'class="active"' : '') . '><a href="admins.php">' . getString('admin', 'Admin') . '</a></li>'
-                                    : "") . '                                
+                            <ul class="nav navbar-nav">
+                                <li ' . ($page_name === 'points' ? 'class="active"' : '') . '><a href="points.php">' . getString('points', 'Points') . '</a></li>
+                                <li ' . ($page_name === 'feedback' ? 'class="active"' : '') . '><a href="feedback.php">' . getString('feedback', 'Feedback') . '</a></li>
+                                <!-- <li ' . ($page_name === 'tracks' ? 'class="active"' : '') . '><a href="tracks.php">' . getString('tracks', 'Tracks') . '</a></li>
+                                <li ' . ($page_name === 'polygons' ? 'class="active"' : '') . '><a href="polygons.php">' . getString('polygons', 'Polygons') . '</a></li> -->
+                                ' . (isset($_SESSION['admin_user']) ? 
+                                    '<li ' . (substr($page_name, 0, 5) === 'admin' ? 'class="active"' : '') . '><a href="adminf.php">' . getString('admin', 'Admin') . '</a></li>'
+                                    : "") . '
                             </ul>
                             <ul class="nav navbar-nav navbar-right">' . 
                                 (
@@ -80,27 +69,6 @@ function get_navbar_depend_on_page($page_name) {
                     <!-- /.container -->
                 </div>
                 <!-- /.navbar -->';
-    
-    return $ret;
 }
 
 ?>
-<script>
-navigator.sayswho= (function(){
-    var ua= navigator.userAgent, tem, 
-    M= ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
-    if(/trident/i.test(M[1])){
-        tem=  /\brv[ :]+(\d+)/g.exec(ua) || [];
-        return 'IE '+(tem[1] || '');
-    }
-    if(M[1]=== 'Chrome'){
-        tem= ua.match(/\b(OPR|Edge)\/(\d+)/);
-        if(tem!= null) return tem.slice(1).join(' ').replace('OPR', 'Opera');
-    }
-    M= M[2]? [M[1], M[2]]: [navigator.appName, navigator.appVersion, '-?'];
-    if((tem= ua.match(/version\/(\d+)/i))!= null) M.splice(1, 1, tem[1]);
-    return M.join(' ');
-})();
-
-console.log(navigator.sayswho);
-</script>

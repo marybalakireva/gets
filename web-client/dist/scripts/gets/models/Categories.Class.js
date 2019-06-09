@@ -56,19 +56,9 @@ CategoriesClass.prototype.downloadCategories = function () {
     $(categoryElementList).each(function (index, value) {
         var categoryObj = {};
         categoryObj.id = $(value).find('id').length ? $(value).find('id').text() : '';
-        categoryObj.names = $(value).find('name').length ? parseVals($(value).find('name').text()) : '';
-        categoryObj.description = $(value).find('description').length ? parseVals($(value).find('description').text()) : '';
-        categoryObj.url = $(value).find('url').length ? parseVals($(value).find('url').text()) : '';
-        if (typeof(categoryObj.names) === 'object') {
-    	    var langID = lang.substr(lang.indexOf("lang=") + 5,2);
-    	    if (categoryObj.names.hasOwnProperty("name_" + langID)) {
-    		categoryObj.name = categoryObj.names["name_" + langID];
-    	    } else {
-    		categoryObj.name = categoryObj.names.name;
-    	    }
-        } else {
-    	    categoryObj.name = categoryObj.names;
-        }
+        categoryObj.name = $(value).find('name').length ? $(value).find('name').text() : '';
+        categoryObj.description = $(value).find('description').length ? $(value).find('description').text() : '';
+        categoryObj.url = $(value).find('url').length ? $(value).find('url').text() : '';
 
         categoriesArray.push(categoryObj);
     });
@@ -76,29 +66,10 @@ CategoriesClass.prototype.downloadCategories = function () {
     this.categories = categoriesArray;
 };
 
-function parseVals(stringValue) {
-    try {
-	return JSON.parse(stringValue);
-    } catch (e) {
-	return stringValue;
-    }
-}
-
 /**
  * Getters
  */
 CategoriesClass.prototype.getCategories = function () {
     this.checkCategories();
     return this.categories;
-};
-
-
-
-CategoriesClass.prototype.getCategory = function (id) {
-    this.checkCategories();
-    for (var i = 0; i < this.categories.length; i++) {
-	if (this.categories[i].id === id) {
-	    return this.categories[i];
-	}
-    }
 };

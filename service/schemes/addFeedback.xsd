@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="request">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="params">
+          <xs:complexType>
+            <xs:all>
+              <xs:element type="xs:string" name="auth_token"/>
+              <xs:element type="xs:integer" name="category" />
+              <xs:element type="xs:string" name="comment"/>
+              
+            </xs:all>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

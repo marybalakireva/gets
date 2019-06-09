@@ -9,16 +9,14 @@ function array2xml($array, $wrap='params') {
     // set initial value for XML string
     $xml = '';
     // wrap XML with $wrap TAG
-    if (!is_null($wrap)) {
+    if ($wrap != null) {
         $xml .= "<$wrap>\n";
     }
     // main loop
-    if (!is_null($array)) {
-	traversArray($array, $xml);
-    }
+    traversArray($array, $xml);
 
     // close wrap TAG if needed
-    if (!is_null($wrap)) {
+    if ($wrap != null) {
         $xml .= "\n</$wrap>\n";
     }
     // return prepared XML string

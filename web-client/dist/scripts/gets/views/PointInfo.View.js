@@ -34,8 +34,6 @@ PointInfo.prototype.placePointInPointInfo = function(point, isAuth) {
     var photoElement = $(this.pointInfo).find('#point-info-image');
     var noPhotoElement = $(this.pointInfo).find('#no-point-info-image');
     var extendedDataElement = $(this.pointInfo).find('#point-info-extended-data');
-    var categoryElement = $(this.pointInfo).find('#point-category');
-    var categoryImageElement = $(this.pointInfo).find('#point-category-image');
     
     // Clear value of all elements
     $(nameElement).text('');
@@ -46,7 +44,6 @@ PointInfo.prototype.placePointInPointInfo = function(point, isAuth) {
     $(urlElement).attr('href', '').text('');
     $(audioElement).empty();
     $(extendedDataElement).html('');
-    $(categoryElement).text('');
 
     // Then fill elemnts with new values 
     $(nameElement).text(point.name).attr('title', point.name);
@@ -55,10 +52,8 @@ PointInfo.prototype.placePointInPointInfo = function(point, isAuth) {
     $(coordsElementLat).text(coords[1]);
     $(coordsElementLon).text(coords[0]);
     $(coordsElementAlt).text(coords[2]);
-
-    if (point.description !== '{}') {
-	$(descElement).html(point.description);
-    }
+    
+    $(descElement).html(point.description);
           
     if (point.url !== '' && point.url !== '{}') {
         $(urlElement).attr('href', point.url).text(point.url);
@@ -76,7 +71,6 @@ PointInfo.prototype.placePointInPointInfo = function(point, isAuth) {
 
     $(photoElement).find('a').attr('href', '');
     $(photoElement).find('img').attr('src', '');
-    $(categoryImageElement).find('img').attr('src', '');
 
     if (point.photos.length > 0) {
         $(noPhotoElement).removeClass('show').addClass('hidden');
@@ -97,9 +91,6 @@ PointInfo.prototype.placePointInPointInfo = function(point, isAuth) {
         $(noPhotoElement).removeClass('hidden').addClass('show');
         $(photoElement).removeClass('show').addClass('hidden');
     }
-    
-    $(categoryElement).text(point.categoryName);
-    $(categoryImageElement).find('img').attr('src', point.iconURL).attr('alt', point.categoryName);
         
     var extendedDataText = '';
     for (var i = 0, len = point.extendedData.length; i < len; i++) {

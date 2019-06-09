@@ -1,5 +1,4 @@
 <?php
-require_once('../config.php');
 require_once('utils/process_request.inc');
 require_once('utils/constants.inc');
 require_once('utils/methods_url.inc');
@@ -19,7 +18,16 @@ if (filter_input(INPUT_SERVER, 'REQUEST_METHOD') == 'POST') {
     $auth_token_array['auth_token'] = $_SESSION['g2t_token'];
     $combined_array = array_merge($auth_token_array, $post_data_array);        
     $data = array2xml($combined_array, 'params');
-    echo process_request(WRITE_TAG_METHOD_URL, '<request>' . $data . '</request>', 'Content-Type: text/xml');   
+
+
+    ob_start();
+
+
+    echo process_request(WRITE_TAG_METHOD_URL, '<request>' . $data . '</request>', 'Content-Type: text/xml');
+
+    $out = ob_get_contents();
+    ob_end_clean();
+    file_put_contents("test.log",$out,FILE_APPEND);
 } else {
     die('<response><status><code>1</code><message>Not POST request</message></status></response>');
 }

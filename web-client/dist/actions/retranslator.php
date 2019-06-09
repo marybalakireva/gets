@@ -1,5 +1,4 @@
 <?php
-require_once('../config.php');
 require_once('utils/process_request.inc');
 
 $post_data_json = file_get_contents('php://input');

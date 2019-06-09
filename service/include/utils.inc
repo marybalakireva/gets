@@ -429,9 +429,22 @@ function safe_pg_insert($dbconn, $table, $data_array) {
 
     $values = implode(",", $values_array);
     $names = implode(",", $names_array);
-    return pg_query($dbconn, "INSERT INTO $table ($names) VALUES ($values);");
+    $query = "INSERT INTO $table ($names) VALUES ($values);";
+    pg_query($dbconn, $query);
+    return $query;
+//    return "INSERT INTO $table ($names) VALUES ($values);";
 }
 
+function get_category_name($dbconn, $category_id) {
+
+    $result = pg_query($dbconn,"SELECT category.name FROM category WHERE category.id='$category_id';");
+    $row = pg_fetch_row($result);
+    if ($row) {
+        return $row[0];
+    } else {
+        return null;
+    }
+}
 /**
  * pg_update without possible backslash escaping issues
  */

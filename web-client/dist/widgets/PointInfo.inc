@@ -16,8 +16,10 @@ echo    '<div id="point-info-page" class="action-menu-container hidden" data-pag
                 </div>
             </div>
             <div class="action-menu-inner-content">              
-                <div id="point-category-image" style="float:right"><img src="images/icons/marker_hole.png" alt="No image"  style="float:right;width:42px;"></div>
                 <div id="point-info-name" class="main-block font-big height-half"></div>               
+                <!--<div id="point-info-map" class="button-w-icon" title="Show on map">
+                    <img src="images/icons/map.png" alt="Show on map">
+                </div>-->
                 <div class="main-block">
                     <label>' . getString('coordinates','Coordinates') . '</label>
                     <div class="emulate-tab"><label>' . getString('latitude','Latitude') . ': &nbsp;</label><div id="point-info-coords-lat" class="inline"></div></div>
@@ -61,10 +63,6 @@ echo    '<div id="point-info-page" class="action-menu-container hidden" data-pag
                         </audio>-->                
                     </div>
                 </div>
-        	<div class="main-block">
-        	    <label for="point-category">' . getString('category','Category') . ': &nbsp;</label><div id="point-category" class="inline"></div>
-        	</div>
-
                 <div class="main-block">
                     <label for="point-info-audio">' . getString('extended-data', 'Extended data') . '</label>
                     <div id="point-info-extended-data">               

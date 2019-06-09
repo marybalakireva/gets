@@ -190,7 +190,7 @@ $(document).ready(function() {
         }
 
          $("table tr").each(function(index) {
-            $(this).fadeOut();
+             $(this).fadeOut();
         }) 
         // так как пробегаемся еще и по заголовку
         var countUsers = -1;
